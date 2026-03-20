@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Syne&weight=800&size=40&pause=1000&color=6366F1&center=true&vCenter=true&width=700&height=80&lines=SENTINEL;Helpdesk+Intelligence+Platform" alt="Sentinel" />
+<img src="https://readme-typing-svg.demolab.com?font=Syne&weight=800&size=40&pause=1000&color=6366F1&center=true&vCenter=true&width=1200&height=80&lines=SENTINEL;Helpdesk+Intelligence+Platform" alt="Sentinel" />
 
 <br/>
 
