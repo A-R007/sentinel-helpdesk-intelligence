@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+
+# Models (too large for GitHub, auto-downloaded on first run)
+~/.cache/huggingface/
+~/.cache/whisper/
+
+# Database and logs
+*.db
+*.db-shm
+*.db-wal
+logs/
+temp_uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

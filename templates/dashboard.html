@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sentinel — Helpdesk Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --bg-0     : #08090d;
+  --bg-1     : #0e1018;
+  --bg-2     : #141720;
+  --bg-3     : #1a1e2a;
+  --bg-4     : #202535;
+  --line     : rgba(255,255,255,.07);
+  --line-med : rgba(255,255,255,.12);
+
+  --ink-1    : #f0f2ff;
+  --ink-2    : #9ba3c0;
+  --ink-3    : #555e7a;
+
+  --green    : #00d68f;
+  --green-bg : rgba(0,214,143,.10);
+  --amber    : #f5a623;
+  --amber-bg : rgba(245,166,35,.10);
+  --red      : #ff4d6d;
+  --red-bg   : rgba(255,77,109,.10);
+  --blue     : #4d9fff;
+  --blue-bg  : rgba(77,159,255,.10);
+  --violet   : #9b72ff;
+  --violet-bg: rgba(155,114,255,.10);
+
+  --p1-c : var(--red);    --p1-bg: var(--red-bg);
+  --p2-c : var(--amber);  --p2-bg: var(--amber-bg);
+  --p3-c : var(--blue);   --p3-bg: var(--blue-bg);
+  --p4-c : var(--green);  --p4-bg: var(--green-bg);
+
+  --radius-sm : 6px;
+  --radius    : 10px;
+  --radius-lg : 16px;
+  --radius-xl : 24px;
+
+  --font-display: 'Syne', sans-serif;
+  --font-body   : 'DM Sans', sans-serif;
+  --font-mono   : 'JetBrains Mono', monospace;
+  --ease        : cubic-bezier(.16,1,.3,1);
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family : var(--font-body);
+  background  : var(--bg-0);
+  color       : var(--ink-1);
+  min-height  : 100vh;
+  font-size   : 14px;
+  line-height : 1.6;
+  overflow-x  : hidden;
+}
+
+/* Background grid */
+body::before {
+  content  : '';
+  position : fixed;
+  inset    : 0;
+  background:
+    linear-gradient(rgba(155,114,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155,114,255,.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events : none;
+  z-index        : 0;
+}
+
+/* ── Layout ─────────────────────────────── */
+.shell {
+  max-width  : 1340px;
+  margin     : 0 auto;
+  padding    : 0 28px 80px;
+  position   : relative;
+  z-index    : 1;
+}
+
+/* ── Typography ─────────────────────────── */
+h1,h2,h3,h4 { font-family:var(--font-display); font-weight:700; }
+.label {
+  font-family    : var(--font-mono);
+  font-size      : 10px;
+  letter-spacing : .12em;
+  text-transform : uppercase;
+  color          : var(--ink-3);
+}
+
+/* ── Header ─────────────────────────────── */
+.header {
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  padding         : 28px 0 32px;
+  border-bottom   : 1px solid var(--line);
+  margin-bottom   : 36px;
+}
+
+.logo {
+  display     : flex;
+  align-items : center;
+  gap         : 14px;
+}
+
+.logo-mark {
+  width           : 42px;
+  height          : 42px;
+  background      : linear-gradient(135deg, var(--violet), var(--blue));
+  border-radius   : 10px;
+  display         : flex;
+  align-items     : center;
+  justify-content : center;
+  font-family     : var(--font-display);
+  font-weight     : 800;
+  font-size       : 18px;
+  color           : #fff;
+  flex-shrink     : 0;
+}
+
+.logo-text h1 {
+  font-size      : 20px;
+  font-weight    : 700;
+  letter-spacing : -.02em;
+  line-height    : 1.1;
+}
+
+.logo-text p {
+  font-size  : 12px;
+  color      : var(--ink-3);
+  margin-top : 2px;
+}
+
+.header-right {
+  display     : flex;
+  align-items : center;
+  gap         : 16px;
+}
+
+.live-pill {
+  display         : flex;
+  align-items     : center;
+  gap             : 7px;
+  background      : var(--green-bg);
+  border          : 1px solid rgba(0,214,143,.2);
+  border-radius   : 20px;
+  padding         : 5px 12px;
+  font-family     : var(--font-mono);
+  font-size       : 11px;
+  color           : var(--green);
+}
+
+.live-dot {
+  width         : 7px;
+  height        : 7px;
+  border-radius : 50%;
+  background    : var(--green);
+  animation     : pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(0,214,143,.4); }
+  50%    { opacity:.6; box-shadow:0 0 0 5px rgba(0,214,143,0); }
+}
+
+/* ── Tabs ───────────────────────────────── */
+.tabs {
+  display       : flex;
+  gap           : 4px;
+  margin-bottom : 32px;
+  background    : var(--bg-2);
+  padding       : 4px;
+  border-radius : var(--radius);
+  border        : 1px solid var(--line);
+  width         : fit-content;
+}
+
+.tab {
+  padding       : 8px 20px;
+  font-family   : var(--font-display);
+  font-size     : 13px;
+  font-weight   : 600;
+  color         : var(--ink-3);
+  border-radius : var(--radius-sm);
+  cursor        : pointer;
+  transition    : all .2s var(--ease);
+  border        : none;
+  background    : none;
+  white-space   : nowrap;
+}
+
+.tab:hover { color:var(--ink-2); }
+
+.tab.active {
+  background : var(--bg-4);
+  color      : var(--ink-1);
+  box-shadow : 0 1px 3px rgba(0,0,0,.4);
+}
+
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* ═══════════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════════ */
+.stats-row {
+  display               : grid;
+  grid-template-columns : repeat(auto-fit, minmax(180px,1fr));
+  gap                   : 14px;
+  margin-bottom         : 28px;
+}
+
+.stat-card {
+  background    : var(--bg-2);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius-lg);
+  padding       : 20px 22px;
+  position      : relative;
+  overflow      : hidden;
+  transition    : border-color .2s;
+}
+
+.stat-card:hover { border-color:var(--line-med); }
+
+.stat-card::before {
+  content       : '';
+  position      : absolute;
+  top           : 0; right:0;
+  width         : 80px; height:80px;
+  border-radius : 50%;
+  opacity       : .08;
+  transform     : translate(20px,-20px);
+}
+
+.stat-card.green::before { background:var(--green); }
+.stat-card.amber::before { background:var(--amber); }
+.stat-card.red::before   { background:var(--red);   }
+.stat-card.blue::before  { background:var(--blue);  }
+.stat-card.violet::before{ background:var(--violet);}
+
+.stat-card .label { margin-bottom:10px; }
+
+.stat-value {
+  font-family    : var(--font-display);
+  font-size      : 34px;
+  font-weight    : 800;
+  line-height    : 1;
+  letter-spacing : -.02em;
+}
+
+.stat-sub {
+  font-size  : 12px;
+  color      : var(--ink-3);
+  margin-top : 6px;
+}
+
+.stat-trend {
+  display     : inline-flex;
+  align-items : center;
+  gap         : 4px;
+  font-size   : 11px;
+  font-family : var(--font-mono);
+  padding     : 2px 7px;
+  border-radius: 12px;
+  margin-top  : 8px;
+}
+
+/* ═══════════════════════════════════════════
+   PANELS / CARDS
+═══════════════════════════════════════════ */
+.panel {
+  background    : var(--bg-2);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius-lg);
+  overflow      : hidden;
+}
+
+.panel-head {
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  padding         : 16px 22px;
+  border-bottom   : 1px solid var(--line);
+}
+
+.panel-head h3 {
+  font-size : 14px;
+  font-weight:600;
+  display   : flex;
+  align-items:center;
+  gap       : 8px;
+}
+
+.panel-body { padding:22px; }
+
+.two-col {
+  display               : grid;
+  grid-template-columns : 1fr 1fr;
+  gap                   : 14px;
+  margin-bottom         : 28px;
+}
+
+@media (max-width:780px) { .two-col { grid-template-columns:1fr; } }
+
+/* ═══════════════════════════════════════════
+   DISTRIBUTION BARS
+═══════════════════════════════════════════ */
+.dist-bar-track {
+  display       : flex;
+  height        : 8px;
+  border-radius : 4px;
+  overflow      : hidden;
+  gap           : 2px;
+  margin-bottom : 14px;
+}
+
+.dist-seg { transition: width .6s var(--ease); border-radius:3px; }
+.dist-seg.pos  { background:var(--green); }
+.dist-seg.neu  { background:var(--ink-3); }
+.dist-seg.neg  { background:var(--red);   }
+
+.dist-legend {
+  display   : flex;
+  flex-wrap : wrap;
+  gap       : 14px;
+}
+
+.legend-item {
+  display     : flex;
+  align-items : center;
+  gap         : 7px;
+  font-size   : 12px;
+  color       : var(--ink-2);
+}
+
+.legend-dot {
+  width         : 8px;
+  height        : 8px;
+  border-radius : 50%;
+  flex-shrink   : 0;
+}
+
+.legend-item strong {
+  color       : var(--ink-1);
+  font-weight : 500;
+}
+
+/* Priority bars */
+.pri-row {
+  display       : flex;
+  align-items   : center;
+  gap           : 12px;
+  margin-bottom : 12px;
+}
+
+.pri-label {
+  font-family  : var(--font-mono);
+  font-size    : 11px;
+  font-weight  : 500;
+  min-width    : 24px;
+}
+
+.pri-track {
+  flex          : 1;
+  height        : 5px;
+  background    : var(--bg-4);
+  border-radius : 3px;
+  overflow      : hidden;
+}
+
+.pri-fill {
+  height        : 100%;
+  border-radius : 3px;
+  transition    : width .6s var(--ease);
+}
+
+.pri-count {
+  font-family : var(--font-mono);
+  font-size   : 11px;
+  color       : var(--ink-3);
+  min-width   : 20px;
+  text-align  : right;
+}
+
+/* ═══════════════════════════════════════════
+   ADD CALL PANEL
+═══════════════════════════════════════════ */
+.add-panel {
+  background    : var(--bg-1);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius-xl);
+  overflow      : hidden;
+  margin-bottom : 28px;
+}
+
+.add-panel-header {
+  background      : linear-gradient(135deg, rgba(155,114,255,.12), rgba(77,159,255,.08));
+  border-bottom   : 1px solid var(--line);
+  padding         : 28px 32px 24px;
+}
+
+.add-panel-header h2 {
+  font-size      : 22px;
+  font-weight    : 700;
+  letter-spacing : -.02em;
+  margin-bottom  : 6px;
+}
+
+.add-panel-header p {
+  font-size : 13px;
+  color     : var(--ink-2);
+}
+
+.add-panel-body {
+  padding : 32px;
+}
+
+/* Mode toggle */
+.mode-toggle {
+  display         : flex;
+  gap             : 0;
+  margin-bottom   : 28px;
+  background      : var(--bg-3);
+  border-radius   : var(--radius);
+  border          : 1px solid var(--line);
+  width           : fit-content;
+  overflow        : hidden;
+}
+
+.mode-btn {
+  padding       : 10px 22px;
+  font-family   : var(--font-body);
+  font-size     : 13px;
+  font-weight   : 500;
+  color         : var(--ink-3);
+  background    : none;
+  border        : none;
+  cursor        : pointer;
+  transition    : all .2s;
+  display       : flex;
+  align-items   : center;
+  gap           : 7px;
+}
+
+.mode-btn.active {
+  background : var(--violet-bg);
+  color      : var(--violet);
+}
+
+/* Form grid */
+.form-grid {
+  display               : grid;
+  grid-template-columns : 1fr 1fr;
+  gap                   : 18px;
+  margin-bottom         : 18px;
+}
+
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-full { grid-column: 1 / -1; }
+
+@media (max-width:640px) {
+  .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+}
+
+.form-field label {
+  display       : block;
+  font-size     : 12px;
+  font-weight   : 500;
+  color         : var(--ink-2);
+  margin-bottom : 7px;
+  font-family   : var(--font-display);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width         : 100%;
+  background    : var(--bg-3);
+  border        : 1px solid var(--line-med);
+  border-radius : var(--radius);
+  padding       : 10px 14px;
+  font-size     : 13px;
+  font-family   : var(--font-body);
+  color         : var(--ink-1);
+  transition    : border-color .2s, box-shadow .2s;
+  outline       : none;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder { color:var(--ink-3); }
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color : rgba(155,114,255,.5);
+  box-shadow   : 0 0 0 3px rgba(155,114,255,.1);
+}
+
+.form-field textarea { resize:vertical; min-height:110px; line-height:1.7; }
+
+.form-field select option { background:var(--bg-3); }
+
+/* Upload zone */
+.upload-zone {
+  border        : 2px dashed var(--line-med);
+  border-radius : var(--radius-lg);
+  padding       : 36px 24px;
+  text-align    : center;
+  cursor        : pointer;
+  transition    : all .2s;
+  position      : relative;
+  margin-bottom : 18px;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color : rgba(155,114,255,.5);
+  background   : var(--violet-bg);
+}
+
+.upload-zone input[type="file"] {
+  position : absolute;
+  inset    : 0;
+  opacity  : 0;
+  cursor   : pointer;
+  width    : 100%;
+  height   : 100%;
+}
+
+.upload-icon {
+  width         : 52px;
+  height        : 52px;
+  margin        : 0 auto 14px;
+  background    : var(--violet-bg);
+  border        : 1px solid rgba(155,114,255,.25);
+  border-radius : 14px;
+  display       : flex;
+  align-items   : center;
+  justify-content:center;
+  font-size     : 22px;
+}
+
+.upload-zone h4 {
+  font-size   : 15px;
+  font-weight : 600;
+  margin-bottom:6px;
+}
+
+.upload-zone p {
+  font-size : 12px;
+  color     : var(--ink-3);
+}
+
+#file-name-display {
+  margin-top  : 10px;
+  font-size   : 12px;
+  color       : var(--violet);
+  font-family : var(--font-mono);
+}
+
+/* Submit button */
+.btn-primary {
+  background      : linear-gradient(135deg, var(--violet), var(--blue));
+  color           : #fff;
+  border          : none;
+  border-radius   : var(--radius);
+  padding         : 12px 28px;
+  font-size       : 14px;
+  font-family     : var(--font-display);
+  font-weight     : 600;
+  cursor          : pointer;
+  transition      : opacity .2s, transform .15s;
+  display         : inline-flex;
+  align-items     : center;
+  gap             : 8px;
+  letter-spacing  : -.01em;
+}
+
+.btn-primary:hover    { opacity:.9; transform:translateY(-1px); }
+.btn-primary:active   { transform:translateY(0); }
+.btn-primary:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+.btn-ghost {
+  background    : transparent;
+  color         : var(--ink-2);
+  border        : 1px solid var(--line-med);
+  border-radius : var(--radius);
+  padding       : 9px 18px;
+  font-size     : 13px;
+  font-family   : var(--font-body);
+  cursor        : pointer;
+  transition    : all .2s;
+  display       : inline-flex;
+  align-items   : center;
+  gap           : 6px;
+}
+
+.btn-ghost:hover { border-color:var(--line-med); color:var(--ink-1); background:var(--bg-3); }
+
+.form-actions {
+  display     : flex;
+  gap         : 12px;
+  align-items : center;
+  margin-top  : 8px;
+  flex-wrap   : wrap;
+}
+
+/* ═══════════════════════════════════════════
+   RESULT CARD (after analysis)
+═══════════════════════════════════════════ */
+.result-card {
+  display       : none;
+  margin-top    : 24px;
+  background    : var(--bg-3);
+  border-radius : var(--radius-lg);
+  border        : 1px solid var(--line);
+  overflow      : hidden;
+  animation     : slideUp .35s var(--ease);
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+
+.result-header {
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  padding         : 16px 22px;
+  border-bottom   : 1px solid var(--line);
+  background      : linear-gradient(135deg,rgba(155,114,255,.06),transparent);
+}
+
+.result-header h4 {
+  font-size  : 13px;
+  font-weight: 600;
+  display    : flex;
+  align-items: center;
+  gap        : 8px;
+}
+
+.result-grid {
+  display               : grid;
+  grid-template-columns : repeat(auto-fit,minmax(130px,1fr));
+  gap                   : 0;
+}
+
+.result-cell {
+  padding     : 16px 20px;
+  border-right: 1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+
+.result-cell:last-child { border-right:none; }
+
+.result-cell .label { margin-bottom:6px; }
+
+.result-cell .val {
+  font-family  : var(--font-display);
+  font-size    : 18px;
+  font-weight  : 700;
+  line-height  : 1.2;
+}
+
+.result-transcript {
+  padding     : 16px 22px;
+  font-size   : 13px;
+  color       : var(--ink-2);
+  line-height : 1.8;
+  font-style  : italic;
+  border-bottom:1px solid var(--line);
+}
+
+.result-action {
+  padding    : 14px 22px;
+  font-size  : 13px;
+  color      : var(--ink-2);
+  line-height: 1.6;
+}
+
+.result-action strong { color:var(--ink-1); }
+
+/* ═══════════════════════════════════════════
+   CALL TABLE
+═══════════════════════════════════════════ */
+.toolbar {
+  display         : flex;
+  gap             : 10px;
+  align-items     : center;
+  flex-wrap       : wrap;
+  padding         : 14px 22px;
+  border-bottom   : 1px solid var(--line);
+  background      : var(--bg-2);
+}
+
+.search-wrap {
+  position    : relative;
+  flex        : 1;
+  min-width   : 200px;
+}
+
+.search-wrap svg {
+  position  : absolute;
+  left      : 12px;
+  top       : 50%;
+  transform : translateY(-50%);
+  opacity   : .4;
+}
+
+.search-wrap input {
+  width         : 100%;
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius);
+  padding       : 8px 12px 8px 36px;
+  font-size     : 13px;
+  color         : var(--ink-1);
+  font-family   : var(--font-body);
+  outline       : none;
+  transition    : border-color .2s;
+}
+
+.search-wrap input:focus { border-color:rgba(155,114,255,.4); }
+.search-wrap input::placeholder { color:var(--ink-3); }
+
+.filter-select {
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius);
+  padding       : 8px 12px;
+  font-size     : 13px;
+  color         : var(--ink-1);
+  font-family   : var(--font-body);
+  cursor        : pointer;
+  outline       : none;
+}
+
+.filter-select option { background:var(--bg-3); }
+
+.export-btn {
+  display       : flex;
+  align-items   : center;
+  gap           : 6px;
+  padding       : 8px 14px;
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius);
+  font-size     : 13px;
+  color         : var(--ink-2);
+  text-decoration:none;
+  transition    : all .2s;
+  white-space   : nowrap;
+}
+
+.export-btn:hover { color:var(--ink-1); border-color:var(--line-med); }
+
+/* Table */
+.table-wrap { overflow-x:auto; }
+
+table {
+  width           : 100%;
+  border-collapse : collapse;
+  min-width       : 800px;
+}
+
+thead th {
+  font-family    : var(--font-mono);
+  font-size      : 10px;
+  letter-spacing : .1em;
+  text-transform : uppercase;
+  color          : var(--ink-3);
+  padding        : 11px 18px;
+  text-align     : left;
+  border-bottom  : 1px solid var(--line);
+  white-space    : nowrap;
+}
+
+tbody tr {
+  border-bottom : 1px solid var(--line);
+  cursor        : pointer;
+  transition    : background .12s;
+}
+
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--bg-3); }
+
+tbody td {
+  padding    : 12px 18px;
+  font-size  : 13px;
+  color      : var(--ink-1);
+  white-space: nowrap;
+  overflow   : hidden;
+  text-overflow:ellipsis;
+  max-width  : 260px;
+}
+
+tbody td.muted { color:var(--ink-3); font-family:var(--font-mono); font-size:12px; }
+
+/* ═══════════════════════════════════════════
+   BADGES
+═══════════════════════════════════════════ */
+.badge {
+  display       : inline-flex;
+  align-items   : center;
+  gap           : 5px;
+  font-family   : var(--font-mono);
+  font-size     : 11px;
+  font-weight   : 500;
+  padding       : 3px 9px;
+  border-radius : 20px;
+  white-space   : nowrap;
+}
+
+.badge-positive  { background:var(--green-bg); color:var(--green); }
+.badge-neutral   { background:rgba(85,94,122,.2); color:var(--ink-2); }
+.badge-negative  { background:var(--red-bg);   color:var(--red);   }
+.badge-p1        { background:var(--red-bg);   color:var(--red);   }
+.badge-p2        { background:var(--amber-bg); color:var(--amber); }
+.badge-p3        { background:var(--blue-bg);  color:var(--blue);  }
+.badge-p4        { background:var(--green-bg); color:var(--green); }
+.badge-escalating{ background:rgba(255,77,109,.15); color:var(--red); }
+.badge-stable    { background:var(--bg-4); color:var(--ink-3); }
+.badge-deescalating{ background:var(--green-bg); color:var(--green); }
+
+/* Polarity mini-bar */
+.pol-wrap { display:flex; align-items:center; gap:7px; }
+.pol-track {
+  width    : 52px; height:4px;
+  background: var(--bg-4);
+  border-radius:2px;
+  position :relative;
+  overflow :hidden;
+}
+.pol-fill {
+  position     :absolute;
+  top:0; height:100%;
+  border-radius:2px;
+}
+
+/* ═══════════════════════════════════════════
+   PAGINATION
+═══════════════════════════════════════════ */
+.pagination {
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  padding         : 12px 22px;
+  border-top      : 1px solid var(--line);
+  font-size       : 12px;
+  color           : var(--ink-3);
+  font-family     : var(--font-mono);
+}
+
+.pag-btns { display:flex; gap:6px; }
+
+.pag-btn {
+  padding       : 5px 14px;
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius-sm);
+  font-size     : 12px;
+  color         : var(--ink-2);
+  cursor        : pointer;
+  transition    : all .2s;
+  font-family   : var(--font-mono);
+}
+
+.pag-btn:hover:not(:disabled) { border-color:var(--line-med); color:var(--ink-1); }
+.pag-btn:disabled { opacity:.3; cursor:not-allowed; }
+
+/* Empty state */
+.empty-state {
+  text-align : center;
+  padding    : 56px 24px;
+  color      : var(--ink-3);
+}
+
+.empty-state .empty-icon {
+  font-size     : 36px;
+  margin-bottom : 14px;
+  opacity       : .4;
+}
+
+.empty-state h3 {
+  font-size   : 16px;
+  color       : var(--ink-2);
+  font-weight : 500;
+  margin-bottom:8px;
+}
+
+.empty-state p { font-size:13px; }
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  display         : none;
+  position        : fixed;
+  inset           : 0;
+  background      : rgba(0,0,0,.75);
+  backdrop-filter : blur(6px);
+  z-index         : 200;
+  align-items     : center;
+  justify-content : center;
+  padding         : 24px;
+}
+
+.modal-overlay.open { display:flex; }
+
+.modal {
+  background    : var(--bg-2);
+  border        : 1px solid var(--line-med);
+  border-radius : var(--radius-xl);
+  width         : 100%;
+  max-width     : 620px;
+  max-height    : 85vh;
+  overflow-y    : auto;
+  animation     : modalIn .25s var(--ease);
+}
+
+@keyframes modalIn {
+  from { opacity:0; transform:scale(.96) translateY(12px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.modal-header {
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  padding         : 20px 24px;
+  border-bottom   : 1px solid var(--line);
+  position        : sticky;
+  top             : 0;
+  background      : var(--bg-2);
+  z-index         : 1;
+}
+
+.modal-header h3 { font-size:16px; }
+
+.modal-close {
+  width         : 30px;
+  height        : 30px;
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius-sm);
+  color         : var(--ink-2);
+  cursor        : pointer;
+  display       : flex;
+  align-items   : center;
+  justify-content:center;
+  font-size     : 16px;
+  transition    : all .15s;
+}
+
+.modal-close:hover { background:var(--red-bg); color:var(--red); border-color:rgba(255,77,109,.2); }
+
+.modal-body { padding:24px; }
+
+.modal-section { margin-bottom:22px; }
+.modal-section:last-child { margin-bottom:0; }
+
+.modal-section h4 {
+  font-size     : 11px;
+  font-family   : var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color         : var(--ink-3);
+  margin-bottom : 12px;
+}
+
+.detail-grid {
+  display               : grid;
+  grid-template-columns : 1fr 1fr;
+  gap                   : 12px;
+}
+
+.detail-item .label { margin-bottom:5px; }
+
+.detail-item .dval {
+  font-family : var(--font-display);
+  font-size   : 16px;
+  font-weight : 600;
+}
+
+.transcript-box {
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius);
+  padding       : 14px 16px;
+  font-size     : 13px;
+  color         : var(--ink-2);
+  line-height   : 1.8;
+  font-style    : italic;
+}
+
+.action-box {
+  background    : var(--bg-3);
+  border-left   : 3px solid var(--violet);
+  border-radius : 0 var(--radius) var(--radius) 0;
+  padding       : 12px 16px;
+  font-size     : 13px;
+  color         : var(--ink-2);
+  line-height   : 1.7;
+}
+
+.signal-grid {
+  display               : grid;
+  grid-template-columns : 1fr 1fr;
+  gap                   : 8px;
+}
+
+.signal-item {
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius-sm);
+  padding       : 10px 12px;
+  font-size     : 12px;
+}
+
+.signal-item .s-label { color:var(--ink-3); margin-bottom:4px; font-size:11px; }
+
+.signal-bar-track {
+  height        : 3px;
+  background    : var(--bg-4);
+  border-radius : 2px;
+  margin-top    : 6px;
+  overflow      : hidden;
+}
+
+.signal-bar-fill { height:100%; border-radius:2px; transition:width .4s var(--ease); }
+
+.kw-list { display:flex; flex-wrap:wrap; gap:6px; }
+
+.notes-area {
+  width         : 100%;
+  background    : var(--bg-3);
+  border        : 1px solid var(--line);
+  border-radius : var(--radius);
+  padding       : 10px 14px;
+  font-size     : 13px;
+  font-family   : var(--font-body);
+  color         : var(--ink-1);
+  resize        : vertical;
+  min-height    : 72px;
+  outline       : none;
+  transition    : border-color .2s;
+}
+
+.notes-area:focus { border-color:rgba(155,114,255,.4); }
+
+.modal-footer {
+  display         : flex;
+  justify-content : space-between;
+  align-items     : center;
+  padding         : 16px 24px;
+  border-top      : 1px solid var(--line);
+  gap             : 10px;
+  flex-wrap       : wrap;
+}
+
+/* ── Spinner ─────────────────────────────── */
+.spinner {
+  width         : 14px;
+  height        : 14px;
+  border        : 2px solid rgba(255,255,255,.25);
+  border-top    : 2px solid #fff;
+  border-radius : 50%;
+  animation     : spin .7s linear infinite;
+  display       : inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Toast notifications ─────────────────── */
+.toast-container {
+  position   : fixed;
+  bottom     : 24px;
+  right      : 24px;
+  z-index    : 999;
+  display    : flex;
+  flex-direction:column;
+  gap        : 10px;
+}
+
+.toast {
+  background    : var(--bg-3);
+  border        : 1px solid var(--line-med);
+  border-radius : var(--radius);
+  padding       : 12px 18px;
+  font-size     : 13px;
+  min-width     : 240px;
+  animation     : toastIn .3s var(--ease);
+  display       : flex;
+  align-items   : center;
+  gap           : 10px;
+}
+
+.toast.success { border-color:rgba(0,214,143,.25); }
+.toast.error   { border-color:rgba(255,77,109,.25); }
+
+@keyframes toastIn {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+</style>
+</head>
+
+<body>
+<div class="shell">
+
+<!-- ══════════════════════════════════════
+     HEADER
+══════════════════════════════════════ -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">S</div>
+    <div class="logo-text">
+      <h1>Sentinel</h1>
+      <p>Helpdesk Intelligence Platform</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill">
+      <span class="live-dot"></span>
+      <span id="last-updated">live</span>
+    </div>
+    <a href="/api/export/csv" class="btn-ghost" style="font-size:12px; padding:7px 14px;">
+      ↓ Export CSV
+    </a>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     TABS
+══════════════════════════════════════ -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('overview',this)">Overview</button>
+  <button class="tab"        onclick="switchTab('add',this)">Add Call</button>
+  <button class="tab"        onclick="switchTab('history',this)">Call History</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB: OVERVIEW
+══════════════════════════════════════ -->
+<div id="tab-overview" class="tab-content active">
+
+  <!-- Stat cards -->
+  <div class="stats-row">
+    <div class="stat-card violet">
+      <div class="label">Total calls</div>
+      <div class="stat-value" id="stat-total">{{ stats.total_calls }}</div>
+      <div class="stat-sub">analyzed to date</div>
+    </div>
+    <div class="stat-card" id="stat-polarity-card">
+      <div class="label">Avg sentiment</div>
+      <div class="stat-value" id="stat-polarity"
+        style="color:{% if stats.avg_polarity > 0.1 %}var(--green){% elif stats.avg_polarity < -0.1 %}var(--red){% else %}var(--ink-2){% endif %}">
+        {{ '%+.2f'|format(stats.avg_polarity) }}
+      </div>
+      <div class="stat-sub">polarity score</div>
+    </div>
+    <div class="stat-card red">
+      <div class="label">P1 Critical</div>
+      <div class="stat-value" style="color:var(--red)" id="stat-p1">
+        {{ stats.priority_counts.get('P1', 0) }}
+      </div>
+      <div class="stat-sub">need escalation</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="label">Escalations</div>
+      <div class="stat-value" style="color:var(--amber)" id="stat-esc">
+        {{ stats.escalation_count or 0 }}
+      </div>
+      <div class="stat-sub">flagged calls</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="label">Avg urgency</div>
+      <div class="stat-value" style="color:var(--blue)" id="stat-urgency">
+        {{ '%.0f'|format(stats.avg_urgency * 100) }}%
+      </div>
+      <div class="stat-sub">urgency index</div>
+    </div>
+  </div>
+
+  <!-- Sentiment + Priority panels -->
+  <div class="two-col">
+
+    <!-- Sentiment distribution -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Sentiment distribution</h3>
+        <span class="label">all calls</span>
+      </div>
+      <div class="panel-body">
+        {% set total = stats.total_calls if stats.total_calls > 0 else 1 %}
+        {% set pos = stats.sentiment_counts.get('positive', 0) %}
+        {% set neu = stats.sentiment_counts.get('neutral',  0) %}
+        {% set neg = stats.sentiment_counts.get('negative', 0) %}
+
+        <div class="dist-bar-track">
+          <div class="dist-seg pos" style="width:{{ (pos/total*100)|round }}%"></div>
+          <div class="dist-seg neu" style="width:{{ (neu/total*100)|round }}%"></div>
+          <div class="dist-seg neg" style="width:{{ (neg/total*100)|round }}%"></div>
+        </div>
+        <div class="dist-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--green)"></div>
+            Positive <strong>{{ pos }}</strong>
+            <span style="color:var(--ink-3)">({{ (pos/total*100)|round|int }}%)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--ink-3)"></div>
+            Neutral <strong>{{ neu }}</strong>
+            <span style="color:var(--ink-3)">({{ (neu/total*100)|round|int }}%)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--red)"></div>
+            Negative <strong>{{ neg }}</strong>
+            <span style="color:var(--ink-3)">({{ (neg/total*100)|round|int }}%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority breakdown -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Priority queue</h3>
+        <span class="label">current load</span>
+      </div>
+      <div class="panel-body">
+        {% for p, color in [('P1','red'),('P2','amber'),('P3','blue'),('P4','green')] %}
+          {% set count = stats.priority_counts.get(p, 0) %}
+          {% set pct   = (count / total * 100)|round|int %}
+          <div class="pri-row">
+            <span class="pri-label" style="color:var(--{{ color }})">{{ p }}</span>
+            <div class="pri-track">
+              <div class="pri-fill"
+                style="width:{{ pct }}%; background:var(--{{ color }})"></div>
+            </div>
+            <span class="pri-count">{{ count }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Trajectory insight -->
+  {% if stats.trajectory_counts %}
+  <div class="panel" style="margin-bottom:28px">
+    <div class="panel-head">
+      <h3>Call trajectory breakdown</h3>
+      <span class="label">emotional arc</span>
+    </div>
+    <div class="panel-body" style="display:flex; gap:24px; flex-wrap:wrap">
+      {% for traj, count in stats.trajectory_counts.items() %}
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="badge badge-{{ 'escalating' if traj=='escalating' else 'deescalating' if traj=='de-escalating' else 'stable' }}">
+            {{ traj }}
+          </span>
+          <span style="font-family:var(--font-mono);font-size:13px;font-weight:600">{{ count }}</span>
+          <span style="font-size:12px;color:var(--ink-3)">calls</span>
+        </div>
+      {% endfor %}
+      <div style="margin-left:auto;font-size:12px;color:var(--ink-3);max-width:380px;line-height:1.6">
+        <strong style="color:var(--red)">Escalating</strong> calls are highest priority even at medium urgency — the caller's patience is exhausted.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div><!-- /tab-overview -->
+
+
+<!-- ══════════════════════════════════════
+     TAB: ADD CALL
+══════════════════════════════════════ -->
+<div id="tab-add" class="tab-content">
+
+  <div class="add-panel">
+    <div class="add-panel-header">
+      <h2>Add a new call for analysis</h2>
+      <p>Upload a voice recording or paste the transcript — no technical knowledge required</p>
+    </div>
+
+    <div class="add-panel-body">
+
+      <!-- Mode toggle -->
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-audio" onclick="setMode('audio')">
+          🎙 Voice recording
+        </button>
+        <button class="mode-btn" id="mode-text" onclick="setMode('text')">
+          📝 Paste transcript
+        </button>
+      </div>
+
+      <!-- ── AUDIO MODE ─────────────────────────── -->
+      <div id="panel-audio">
+        <div class="upload-zone" id="drop-zone">
+          <input type="file" id="audio-file" accept=".wav,.mp3,.flac,.m4a,.ogg,.webm"
+            onchange="onFileSelected(this)"/>
+          <div class="upload-icon">🎙</div>
+          <h4>Drop audio file here or click to browse</h4>
+          <p>Supports WAV, MP3, FLAC, M4A, OGG · Max 50 MB</p>
+          <div id="file-name-display"></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Caller name (optional)</label>
+            <input type="text" id="audio-caller-name" placeholder="e.g. John Smith"/>
+          </div>
+          <div class="form-field">
+            <label>Caller type</label>
+            <select id="audio-repeat">
+              <option value="false">First-time caller</option>
+              <option value="true">Repeat caller</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Time on hold (seconds)</label>
+            <input type="number" id="audio-wait" value="0" min="0" placeholder="0"/>
+          </div>
+          <div class="form-field">
+            <label>Calls today from this number</label>
+            <input type="number" id="audio-calls-today" value="1" min="1" placeholder="1"/>
+          </div>
+        </div>
+
+        <div class="form-field" style="margin-bottom:22px">
+          <label>Agent notes (optional)</label>
+          <textarea id="audio-notes" placeholder="Any notes about this call..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-primary" id="audio-submit-btn" onclick="analyzeAudio()">
+            Analyze recording
+          </button>
+          <span style="font-size:12px;color:var(--ink-3)">
+            Processing takes 5–30 seconds depending on call length
+          </span>
+        </div>
+      </div>
+
+      <!-- ── TEXT MODE ──────────────────────────── -->
+      <div id="panel-text" style="display:none">
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Caller name (optional)</label>
+            <input type="text" id="text-caller-name" placeholder="e.g. Jane Doe"/>
+          </div>
+          <div class="form-field">
+            <label>Caller type</label>
+            <select id="text-repeat">
+              <option value="false">First-time caller</option>
+              <option value="true">Repeat caller</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Time on hold (seconds)</label>
+            <input type="number" id="text-wait" value="0" min="0"/>
+          </div>
+          <div class="form-field">
+            <label>Calls today from this number</label>
+            <input type="number" id="text-calls-today" value="1" min="1"/>
+          </div>
+        </div>
+
+        <div class="form-field" style="margin-bottom:18px">
+          <label>Transcript *</label>
+          <textarea id="text-transcript" rows="6"
+            placeholder="Paste the full call transcript here...&#10;&#10;Example: Hi, I've been waiting three days for my delivery and I still haven't received any update. I called yesterday and nobody resolved it. I'm very frustrated and considering cancelling my order."></textarea>
+        </div>
+
+        <div class="form-field" style="margin-bottom:22px">
+          <label>Agent notes (optional)</label>
+          <textarea id="text-notes" placeholder="Any notes about this call..." rows="2"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-primary" id="text-submit-btn" onclick="analyzeText()">
+            Analyze transcript
+          </button>
+          <span style="font-size:12px;color:var(--ink-3)">
+            Results appear instantly
+          </span>
+        </div>
+      </div>
+
+      <!-- ── RESULT ─────────────────────────────── -->
+      <div class="result-card" id="result-card">
+        <div class="result-header">
+          <h4>✓ Analysis complete — <span id="res-call-id"></span></h4>
+          <button class="btn-ghost" style="font-size:12px;padding:5px 12px"
+            onclick="document.getElementById('result-card').style.display='none'">Dismiss</button>
+        </div>
+        <div class="result-grid" id="result-metrics"></div>
+        <div class="result-transcript" id="result-transcript-text"></div>
+        <div class="result-action" id="result-action-text"></div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /tab-add -->
+
+
+<!-- ══════════════════════════════════════
+     TAB: CALL HISTORY
+══════════════════════════════════════ -->
+<div id="tab-history" class="tab-content">
+
+  <div class="panel">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search transcripts..."
+          oninput="debounce(applyFilters, 350)()"/>
+      </div>
+      <select class="filter-select" id="filter-sentiment" onchange="applyFilters()">
+        <option value="">All sentiments</option>
+        <option value="negative">Negative</option>
+        <option value="neutral">Neutral</option>
+        <option value="positive">Positive</option>
+      </select>
+      <select class="filter-select" id="filter-priority" onchange="applyFilters()">
+        <option value="">All priorities</option>
+        <option value="P1">P1 Critical</option>
+        <option value="P2">P2 High</option>
+        <option value="P3">P3 Medium</option>
+        <option value="P4">P4 Low</option>
+      </select>
+      <select class="filter-select" id="filter-escalation" onchange="applyFilters()">
+        <option value="">All calls</option>
+        <option value="1">Escalated only</option>
+      </select>
+      <a href="/api/export/csv" class="export-btn">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export CSV
+      </a>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Transcript</th>
+            <th>Sentiment</th>
+            <th>Polarity</th>
+            <th>Urgency</th>
+            <th>Priority</th>
+            <th>Trajectory</th>
+          </tr>
+        </thead>
+        <tbody id="calls-tbody">
+          <!-- Populated by JS -->
+          {% for call in calls %}
+          <tr onclick="openModal({{ call.id }})">
+            <td class="muted">{{ call.id }}</td>
+            <td class="muted">{{ call.created_at[:16]|replace('T',' ') }}</td>
+            <td style="max-width:280px">{{ (call.transcript or '')[:70] }}{{ '…' if (call.transcript or '')|length > 70 else '' }}</td>
+            <td><span class="badge badge-{{ call.sentiment_label }}">{{ call.sentiment_label }}</span></td>
+            <td>
+              <div class="pol-wrap">
+                {% set pol = call.polarity or 0 %}
+                {% set pct = ((pol + 1) / 2 * 100)|round|int %}
+                <div class="pol-track">
+                  <div class="pol-fill"
+                    style="
+                      left:{% if pol >= 0 %}50%{% else %}{{ pct }}%{% endif %};
+                      width:{{ (pol|abs / 2 * 100)|round|int }}%;
+                      background:{% if pol >= 0 %}var(--green){% else %}var(--red){% endif %}
+                    "></div>
+                </div>
+                <span class="muted">{{ '%+.2f'|format(pol) }}</span>
+              </div>
+            </td>
+            <td class="muted">{{ '%.0f'|format((call.urgency_score or 0) * 100) }}%</td>
+            <td><span class="badge badge-{{ call.priority|lower }}">{{ call.priority }}</span></td>
+            <td><span class="badge badge-{{ call.trajectory or 'stable' }}">{{ call.trajectory or 'stable' }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8">
+            <div class="empty-state">
+              <div class="empty-icon">📞</div>
+              <h3>No calls yet</h3>
+              <p>Go to "Add Call" to analyze your first recording or transcript</p>
+            </div>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination">
+      <span id="pag-info">Showing {{ calls|length }} calls</span>
+      <div class="pag-btns">
+        <button class="pag-btn" id="pag-prev" onclick="goPage(currentPage-1)" disabled>← Prev</button>
+        <button class="pag-btn" id="pag-next" onclick="goPage(currentPage+1)" disabled>Next →</button>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /tab-history -->
+
+</div><!-- /shell -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ══════════════════════════════════════
+     CALL DETAIL MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="maybeCloseModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Call detail</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- Populated by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="modal-delete-btn" style="color:var(--red);border-color:var(--red-bg)">
+        Delete call
+      </button>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="closeModal()">Close</button>
+        <button class="btn-primary" id="modal-save-notes">Save notes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentPage   = 1;
+let currentCallId = null;
+let currentMode   = 'audio';
+let debounceTimer = null;
+
+const PAGE_SIZE = 25;
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'history') { currentPage = 1; loadTable(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODE TOGGLE (audio / text)
+// ═══════════════════════════════════════════════════════════
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-audio').classList.toggle('active', mode==='audio');
+  document.getElementById('mode-text').classList.toggle('active',  mode==='text');
+  document.getElementById('panel-audio').style.display = mode==='audio' ? '' : 'none';
+  document.getElementById('panel-text').style.display  = mode==='text'  ? '' : 'none';
+  document.getElementById('result-card').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILE SELECTION
+// ═══════════════════════════════════════════════════════════
+function onFileSelected(input) {
+  const name = input.files[0]?.name || '';
+  document.getElementById('file-name-display').textContent = name ? '📎 ' + name : '';
+}
+
+// Drag and drop
+const dropZone = document.getElementById('drop-zone');
+if (dropZone) {
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      document.getElementById('audio-file').files = files;
+      onFileSelected(document.getElementById('audio-file'));
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANALYZE — AUDIO
+// ═══════════════════════════════════════════════════════════
+async function analyzeAudio() {
+  const fileInput = document.getElementById('audio-file');
+  const btn       = document.getElementById('audio-submit-btn');
+
+  if (!fileInput.files.length) {
+    return toast('Please select an audio file first.', 'error');
+  }
+
+  setLoading(btn, true, 'Analyzing...');
+  document.getElementById('result-card').style.display = 'none';
+
+  try {
+    const fd = new FormData();
+    fd.append('file',               fileInput.files[0]);
+    fd.append('repeat_caller',      document.getElementById('audio-repeat').value);
+    fd.append('wait_time_seconds',  document.getElementById('audio-wait').value || '0');
+    fd.append('call_number_today',  document.getElementById('audio-calls-today').value || '1');
+    fd.append('notes',              document.getElementById('audio-notes').value || '');
+
+    const resp = await fetch('/api/analyze', { method:'POST', body:fd });
+    const data = await resp.json();
+    if (!resp.ok) return toast(data.detail || 'Analysis failed.', 'error');
+
+    showResult(data);
+    toast(`Call #${data.call_id} analyzed — ${data.urgency.priority}`, 'success');
+    refreshStats();
+
+  } catch(err) {
+    toast('Request failed: ' + err.message, 'error');
+  } finally {
+    setLoading(btn, false, 'Analyze recording');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANALYZE — TEXT
+// ═══════════════════════════════════════════════════════════
+async function analyzeText() {
+  const text = document.getElementById('text-transcript').value.trim();
+  const btn  = document.getElementById('text-submit-btn');
+
+  if (!text || text.length < 5) {
+    return toast('Please enter at least 5 characters of transcript.', 'error');
+  }
+
+  setLoading(btn, true, 'Analyzing...');
+  document.getElementById('result-card').style.display = 'none';
+
+  try {
+    const fd = new FormData();
+    fd.append('transcript',       text);
+    fd.append('caller_name',      document.getElementById('text-caller-name').value || '');
+    fd.append('repeat_caller',    document.getElementById('text-repeat').value);
+    fd.append('wait_time_seconds',document.getElementById('text-wait').value || '0');
+    fd.append('call_number_today',document.getElementById('text-calls-today').value || '1');
+    fd.append('notes',            document.getElementById('text-notes').value || '');
+
+    const resp = await fetch('/api/analyze/text', { method:'POST', body:fd });
+    const data = await resp.json();
+    if (!resp.ok) return toast(data.detail || 'Analysis failed.', 'error');
+
+    showResult(data);
+    document.getElementById('text-transcript').value = '';
+    toast(`Call #${data.call_id} analyzed — ${data.urgency.priority}`, 'success');
+    refreshStats();
+
+  } catch(err) {
+    toast('Request failed: ' + err.message, 'error');
+  } finally {
+    setLoading(btn, false, 'Analyze transcript');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SHOW RESULT CARD
+// ═══════════════════════════════════════════════════════════
+function showResult(data) {
+  const s = data.sentiment, u = data.urgency, t = data.transcript;
+  const rc = document.getElementById('result-card');
+
+  document.getElementById('res-call-id').textContent = `Call #${data.call_id}`;
+
+  const polColor = s.polarity > 0.1 ? 'var(--green)' :
+                   s.polarity < -0.1 ? 'var(--red)' : 'var(--ink-2)';
+
+  const priBg = {P1:'var(--red)',P2:'var(--amber)',P3:'var(--blue)',P4:'var(--green)'}[u.priority]||'var(--ink-2)';
+
+  document.getElementById('result-metrics').innerHTML = `
+    <div class="result-cell">
+      <div class="label">Sentiment</div>
+      <div class="val"><span class="badge badge-${s.label}">${s.label}</span></div>
+    </div>
+    <div class="result-cell">
+      <div class="label">Polarity</div>
+      <div class="val" style="color:${polColor};font-family:var(--font-mono)">
+        ${s.polarity >= 0 ? '+' : ''}${s.polarity.toFixed(3)}
+      </div>
+    </div>
+    <div class="result-cell">
+      <div class="label">Neutral score</div>
+      <div class="val" style="font-family:var(--font-mono);font-size:16px">
+        ${(s.neutral_score * 100).toFixed(0)}%
+      </div>
+    </div>
+    <div class="result-cell">
+      <div class="label">Trajectory</div>
+      <div class="val"><span class="badge badge-${s.trajectory}">${s.trajectory}</span></div>
+    </div>
+    <div class="result-cell">
+      <div class="label">Urgency</div>
+      <div class="val" style="font-family:var(--font-mono);font-size:16px">
+        ${Math.round(u.score * 100)}%
+      </div>
+    </div>
+    <div class="result-cell">
+      <div class="label">Priority</div>
+      <div class="val" style="color:${priBg}">
+        ${u.priority} — ${u.priority_label}
+      </div>
+    </div>
+  `;
+
+  const kwHtml = u.keywords_found?.length
+    ? `<br/><strong>Keywords:</strong> ${u.keywords_found.slice(0,6).join(', ')}`
+    : '';
+
+  document.getElementById('result-transcript-text').textContent =
+    `"${t.text.substring(0, 200)}${t.text.length > 200 ? '…' : ''}"`;
+
+  document.getElementById('result-action-text').innerHTML =
+    `<strong>Recommended action:</strong> ${u.action}${kwHtml}`;
+
+  rc.style.display = 'block';
+  rc.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ═══════════════════════════════════════════════════════════
+// CALL HISTORY TABLE
+// ═══════════════════════════════════════════════════════════
+async function loadTable() {
+  const params = new URLSearchParams({
+    page  : currentPage,
+    limit : PAGE_SIZE
+  });
+
+  const sentiment = document.getElementById('filter-sentiment')?.value;
+  const priority  = document.getElementById('filter-priority')?.value;
+  const search    = document.getElementById('search-input')?.value?.trim();
+  const escalation= document.getElementById('filter-escalation')?.value;
+
+  if (sentiment) params.set('sentiment', sentiment);
+  if (priority)  params.set('priority',  priority);
+  if (search)    params.set('search',    search);
+  if (escalation==='1') params.set('escalation_only','true');
+
+  try {
+    const resp  = await fetch('/api/calls?' + params);
+    const data  = await resp.json();
+    const calls = data.calls || [];
+    const info  = data.page_info || {};
+
+    const tbody = document.getElementById('calls-tbody');
+
+    if (!calls.length) {
+      tbody.innerHTML = `<tr><td colspan="8">
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>No calls match</h3>
+          <p>Try adjusting your filters or search query</p>
+        </div></td></tr>`;
+    } else {
+      tbody.innerHTML = calls.map(c => {
+        const pol = c.polarity || 0;
+        const polColor = pol > 0.1 ? 'var(--green)' : pol < -0.1 ? 'var(--red)' : 'var(--ink-3)';
+        const timeStr  = (c.created_at||'').replace('T',' ').substring(0,16);
+        const snippet  = (c.transcript||'').substring(0,70) + ((c.transcript||'').length > 70 ? '…' : '');
+        const traj     = c.trajectory || 'stable';
+        return `<tr onclick="openModal(${c.id})">
+          <td class="muted">${c.id}</td>
+          <td class="muted">${timeStr}</td>
+          <td style="max-width:280px">${snippet}</td>
+          <td><span class="badge badge-${c.sentiment_label}">${c.sentiment_label}</span></td>
+          <td>
+            <div class="pol-wrap">
+              <div class="pol-track">
+                <div class="pol-fill"
+                  style="left:${pol>=0?50:Math.round((pol+1)/2*100)}%;
+                  width:${Math.round(Math.abs(pol)/2*100)}%;
+                  background:${polColor}"></div>
+              </div>
+              <span class="muted">${pol>=0?'+':''}${pol.toFixed(2)}</span>
+            </div>
+          </td>
+          <td class="muted">${Math.round((c.urgency_score||0)*100)}%</td>
+          <td><span class="badge badge-${(c.priority||'').toLowerCase()}">${c.priority}</span></td>
+          <td><span class="badge badge-${traj}">${traj}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Pagination
+    document.getElementById('pag-info').textContent =
+      `Page ${info.current_page} of ${info.total_pages} · ${data.total} total`;
+    document.getElementById('pag-prev').disabled = info.current_page <= 1;
+    document.getElementById('pag-next').disabled = !info.has_more;
+
+  } catch(err) {
+    console.error('loadTable:', err);
+  }
+}
+
+function applyFilters() { currentPage = 1; loadTable(); }
+
+function goPage(p) {
+  if (p < 1) return;
+  currentPage = p;
+  loadTable();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════
+async function openModal(callId) {
+  currentCallId = callId;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-body').innerHTML =
+    '<div style="text-align:center;padding:40px;color:var(--ink-3)"><span class="spinner"></span></div>';
+
+  try {
+    const call = await (await fetch(`/api/calls/${callId}`)).json();
+
+    const pol      = call.polarity || 0;
+    const polColor = pol > 0.1 ? 'var(--green)' : pol < -0.1 ? 'var(--red)' : 'var(--ink-2)';
+    const ns       = call.neutral_signals ? JSON.parse(
+      typeof call.neutral_signals==='string' ? call.neutral_signals : JSON.stringify(call.neutral_signals)
+    ) : {};
+    const kws      = Array.isArray(call.matched_keywords) ? call.matched_keywords : [];
+
+    document.getElementById('modal-title').textContent = `Call #${call.id}`;
+
+    document.getElementById('modal-body').innerHTML = `
+
+      <div class="modal-section">
+        <h4>Classification</h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="label">Sentiment</div>
+            <div class="dval"><span class="badge badge-${call.sentiment_label}">${call.sentiment_label}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="label">Priority</div>
+            <div class="dval"><span class="badge badge-${(call.priority||'').toLowerCase()}">${call.priority} — ${call.priority_label}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="label">Polarity</div>
+            <div class="dval" style="color:${polColor};font-family:var(--font-mono)">
+              ${pol>=0?'+':''}${pol.toFixed(4)}
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="label">Trajectory</div>
+            <div class="dval"><span class="badge badge-${call.trajectory||'stable'}">${call.trajectory||'stable'}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="label">Urgency score</div>
+            <div class="dval" style="font-family:var(--font-mono)">${Math.round((call.urgency_score||0)*100)}%</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">Duration</div>
+            <div class="dval" style="font-family:var(--font-mono)">${call.duration||0}s</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Neutral detection signals</h4>
+        <div style="font-size:11px;color:var(--ink-3);margin-bottom:10px;line-height:1.6">
+          Neutral score: <strong style="color:var(--ink-1)">${((call.neutral_score||0)*100).toFixed(1)}%</strong>
+          — score ≥ 45% → classified as neutral (prevents enquiries being misread as negative)
+        </div>
+        <div class="signal-grid">
+          ${[
+            ['Confidence band',  ns.confidence_signal,  'Low model confidence → more likely neutral'],
+            ['Polarity magnitude',ns.polarity_signal,   'Small polarity = weak sentiment'],
+            ['Enquiry ratio',    ns.enquiry_signal,     'Question/request language detected'],
+            ['Vocabulary context',ns.vocabulary_signal, 'Administrative vocab without intensifiers']
+          ].map(([label, val, desc]) => `
+            <div class="signal-item">
+              <div class="s-label">${label}</div>
+              <div style="font-family:var(--font-mono);font-weight:500;font-size:13px">${((val||0)*100).toFixed(0)}%</div>
+              <div class="signal-bar-track">
+                <div class="signal-bar-fill" style="width:${((val||0)*100).toFixed(0)}%;background:var(--violet)"></div>
+              </div>
+              <div style="font-size:10px;color:var(--ink-3);margin-top:5px">${desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Transcript</h4>
+        <div class="transcript-box">"${call.transcript||'—'}"</div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Recommended action</h4>
+        <div class="action-box">${call.action||'—'}<br/>
+          <span style="font-size:12px;color:var(--ink-3);margin-top:6px;display:block">${call.action_detail||''}</span>
+        </div>
+      </div>
+
+      ${kws.length ? `
+      <div class="modal-section">
+        <h4>Urgency keywords detected</h4>
+        <div class="kw-list">
+          ${kws.map(k => `<span class="badge badge-negative">${k}</span>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="modal-section">
+        <h4>Agent notes</h4>
+        <textarea class="notes-area" id="modal-notes-input" placeholder="Add notes about this call...">${call.notes||''}</textarea>
+      </div>
+    `;
+
+    // Wire up save notes and delete
+    document.getElementById('modal-save-notes').onclick = () => saveNotes(callId);
+    document.getElementById('modal-delete-btn').onclick = () => deleteCall(callId);
+
+  } catch(err) {
+    document.getElementById('modal-body').innerHTML =
+      `<p style="color:var(--red);padding:20px">Failed to load call: ${err.message}</p>`;
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  currentCallId = null;
+}
+
+function maybeCloseModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ═══════════════════════════════════════════════════════════
+// NOTES
+// ═══════════════════════════════════════════════════════════
+async function saveNotes(callId) {
+  const notes = document.getElementById('modal-notes-input')?.value || '';
+  const fd    = new FormData();
+  fd.append('notes', notes);
+  try {
+    const resp = await fetch(`/api/calls/${callId}/notes`, { method:'PATCH', body:fd });
+    if (resp.ok) toast('Notes saved', 'success');
+    else         toast('Failed to save notes', 'error');
+  } catch { toast('Network error', 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════════════════
+async function deleteCall(callId) {
+  if (!confirm(`Delete call #${callId}? This cannot be undone.`)) return;
+  try {
+    const resp = await fetch(`/api/calls/${callId}`, { method:'DELETE' });
+    if (resp.ok) {
+      toast(`Call #${callId} deleted`, 'success');
+      closeModal();
+      loadTable();
+      refreshStats();
+    } else {
+      toast('Could not delete call', 'error');
+    }
+  } catch { toast('Network error', 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATS REFRESH
+// ═══════════════════════════════════════════════════════════
+async function refreshStats() {
+  try {
+    const stats = await (await fetch('/api/stats')).json();
+
+    document.getElementById('stat-total').textContent = stats.total_calls;
+    document.getElementById('stat-p1').textContent    = stats.priority_counts['P1'] || 0;
+    document.getElementById('stat-esc').textContent   = stats.escalation_count || 0;
+
+    const pol   = stats.avg_polarity;
+    const polEl = document.getElementById('stat-polarity');
+    polEl.textContent  = (pol >= 0 ? '+' : '') + pol.toFixed(2);
+    polEl.style.color  = pol > 0.1 ? 'var(--green)' : pol < -0.1 ? 'var(--red)' : 'var(--ink-2)';
+
+    const urg = stats.avg_urgency;
+    const urgEl = document.getElementById('stat-urgency');
+    urgEl.textContent = Math.round(urg * 100) + '%';
+    urgEl.style.color = urg > 0.6 ? 'var(--red)' : urg > 0.35 ? 'var(--amber)' : 'var(--blue)';
+
+    document.getElementById('last-updated').textContent =
+      'updated ' + new Date().toLocaleTimeString();
+
+  } catch(err) { console.warn('refreshStats:', err); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════
+function setLoading(btn, loading, label) {
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? `<span class="spinner"></span> ${label}`
+    : label;
+}
+
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = (type==='success'?'✓':'✕') + ' ' + msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function debounce(fn, delay) {
+  return (...args) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// Auto-refresh every 30 seconds
+setInterval(refreshStats, 30000);
+</script>
+
+</body>
+</html>
