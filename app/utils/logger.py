@@ -48,4 +48,5 @@ def get_logger(name: str) -> logging.Logger:
 
     logger.addHandler(ch)
     logger.addHandler(fh)
+    logger.addHandler(logging.NullHandler())
     return logger
